@@ -158,6 +158,7 @@ jobs:
         run: |
           qmake6 phoenix.pro \
             CONFIG+=release \
+            QT+=core5compat \
             DEFINES+=QT_NO_DEBUG
 
       - name: Build Fritzing
