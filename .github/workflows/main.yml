@@ -53,7 +53,8 @@ jobs:
             libxcb-xkb-dev \
             libxkbcommon-x11-0 \
             libssl-dev \
-            libarchive-dev
+            libarchive-dev \
+            zlib1g-dev
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
