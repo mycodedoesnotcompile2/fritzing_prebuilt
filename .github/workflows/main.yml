@@ -211,8 +211,8 @@ jobs:
           qmake6 phoenix.pro \
             CONFIG+=release \
             QT+=core5compat \
-            INCLUDEPATH+=../svgpp/include \
-            INCLUDEPATH+=../polyclipping/include \
+            INCLUDEPATH+="$GITHUB_WORKSPACE/svgpp/include" \
+            INCLUDEPATH+="$GITHUB_WORKSPACE/polyclipping/include" \
             DEFINES+=QT_NO_DEBUG
 
       - name: Build Fritzing
