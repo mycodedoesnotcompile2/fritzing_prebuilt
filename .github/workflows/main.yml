@@ -133,20 +133,25 @@ jobs:
           cmake --build build -j$(nproc)
           cmake --install build
 
-      - name: Fix QuaZip headers for Fritzing
+      - name: Fix QuaZip include layout
+        shell: bash
         run: |
           set -euxo pipefail
       
           QUAZIP_DIR="$GITHUB_WORKSPACE/quazip-6.8.3-1.4intuisphere"
+          QUAZIP_INC="$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip"
       
-          mkdir -p "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip"
+          mkdir -p "$QUAZIP_INC"
       
-          cp "$QUAZIP_DIR/quazip/"*.h \
-             "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip/"
+          # Public headers
+          cp "$QUAZIP_DIR"/quazip/*.h "$QUAZIP_INC/"
       
-          test -f "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip/quazip.h"
+          # Generated configuration header
+          cp "$(find "$QUAZIP_DIR/build" -name quazip_config.h -type f | head -1)" \
+             "$QUAZIP_INC/"
       
-          find "$QUAZIP_DIR/include/QuaZip-Qt6-1.4" -type f
+          echo "QuaZip headers:"
+          find "$QUAZIP_INC" -type f | sort
 
       - name: Configure Fritzing
         working-directory: fritzing-app
