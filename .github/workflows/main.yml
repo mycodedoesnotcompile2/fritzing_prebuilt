@@ -171,6 +171,44 @@ jobs:
           echo "QuaZip headers:"
           find "$QUAZIP_INC" -type f | sort
 
+      - name: Build polyclipping (Clipper 6.4.2)
+        shell: bash
+        run: |
+          cd "$GITHUB_WORKSPACE"
+
+          wget -q \
+            https://downloads.sourceforge.net/project/polyclipping/clipper_ver6.4.2.zip \
+            -O clipper.zip
+
+          unzip -q clipper.zip
+          mv cpp polyclipping
+
+          cd polyclipping
+
+          mkdir build
+          cd build
+
+          cmake .. \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/polyclipping/install"
+
+          make -j"$(nproc)"
+          make install
+
+          cd "$GITHUB_WORKSPACE/polyclipping"
+
+          # Fritzing expects this layout
+          mkdir -p include/polyclipping
+
+          cp install/include/polyclipping/clipper.hpp \
+             include/polyclipping/
+
+          mkdir -p lib
+          cp install/lib/libpolyclipping.so* lib/ || true
+
+          echo "Checking:"
+          ls -l include/polyclipping/clipper.hpp
+
+
       - name: Configure Fritzing
         working-directory: fritzing-app
         run: |
