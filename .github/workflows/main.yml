@@ -60,8 +60,7 @@ jobs:
           modules: >
             qtcharts
             qtserialport
-            qtsvg
-            qttools
+            qt5compat
 
       - name: Prepare dependencies
         run: |
