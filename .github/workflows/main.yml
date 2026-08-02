@@ -61,7 +61,6 @@ jobs:
             qtcharts
             qtserialport
             qtsvg
-            qt5compat
             qttools
 
       - name: Prepare dependencies
