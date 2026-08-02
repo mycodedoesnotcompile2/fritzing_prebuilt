@@ -32,6 +32,11 @@ jobs:
           $APT update
 
           $APT install \
+            autoconf \
+            automake \
+            libtool \
+            bison \
+            flex \
             build-essential \
             cmake \
             ninja-build \
@@ -79,6 +84,32 @@ jobs:
 
           cmake --build build -j$(nproc)
           sudo cmake --install build
+
+
+      - name: Build ngspice
+        run: |
+          cd "$GITHUB_WORKSPACE"
+      
+          git clone --depth=1 \
+            https://git.code.sf.net/p/ngspice/ngspice \
+            ngspice-42
+      
+          cd ngspice-42
+      
+          ./autogen.sh
+      
+          mkdir release
+          cd release
+      
+          ../configure \
+            --with-ngshared \
+            --enable-xspice \
+            --disable-debug \
+            --prefix="$GITHUB_WORKSPACE/ngspice-42/install"
+      
+          make -j$(nproc)
+          make install
+
 
       - name: Configure Fritzing
         working-directory: fritzing-app
