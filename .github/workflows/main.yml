@@ -95,26 +95,44 @@ jobs:
       - name: Build ngspice
         run: |
           cd "$GITHUB_WORKSPACE"
-      
+
           git clone --depth=1 \
             https://git.code.sf.net/p/ngspice/ngspice \
             ngspice-42
-      
+
           cd ngspice-42
-      
+
           ./autogen.sh
-      
+
           mkdir release
           cd release
-      
+
           ../configure \
             --with-ngshared \
             --enable-xspice \
             --disable-debug \
             --prefix="$GITHUB_WORKSPACE/ngspice-42/install"
-      
-          make -j$(nproc)
+
+          make -j"$(nproc)"
           make install
+
+          cd "$GITHUB_WORKSPACE/ngspice-42"
+
+          # Fritzing expects headers directly under ngspice-42/include
+          mkdir -p include/ngspice
+          cp install/include/ngspice/*.h include/ngspice/
+
+          # Fritzing expects the library directly under ngspice-42/lib
+          mkdir -p lib
+          cp install/lib/libngspice.so* lib/
+
+          # Verify Fritzing discovery path
+          echo "ngspice headers:"
+          ls -la include/ngspice/sharedspice.h
+
+          echo "ngspice libraries:"
+          ls -la lib/libngspice.so*
+          
       
       - name: Build QuaZip
         run: |
