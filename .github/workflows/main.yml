@@ -7,6 +7,10 @@ env:
   APT: sudo apt -y -qq -o=Dpkg::Use-Pty=0
   QT_VERSION: 6.8.3
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -128,7 +132,21 @@ jobs:
       
           cmake --build build -j$(nproc)
           cmake --install build
+
+      - name: Fix QuaZip headers for Fritzing
+        run: |
+          set -euxo pipefail
       
+          QUAZIP_DIR="$GITHUB_WORKSPACE/quazip-6.8.3-1.4intuisphere"
+      
+          mkdir -p "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip"
+      
+          cp "$QUAZIP_DIR/quazip/"*.h \
+             "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip/"
+      
+          test -f "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip/quazip.h"
+      
+          find "$QUAZIP_DIR/include/QuaZip-Qt6-1.4" -type f
 
       - name: Configure Fritzing
         working-directory: fritzing-app
