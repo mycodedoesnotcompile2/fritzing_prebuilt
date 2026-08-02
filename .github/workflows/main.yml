@@ -178,11 +178,8 @@ jobs:
           git clone --depth=1 \
             https://github.com/svgpp/svgpp.git \
             svgpp
-
-          mkdir -p svgpp/include
-
-          echo "svgpp installed:"
-          find svgpp/include -maxdepth 2 -type d
+          
+          test -d svgpp/include/svgpp
 
 
       - name: Install polyclipping (Clipper 6.4.2)
@@ -195,17 +192,17 @@ jobs:
 
           unzip -q clipper.zip -d clipper
 
-          mkdir -p /include/polyclipping
+          mkdir -p polyclipping/include
 
           find clipper -name clipper.hpp -print
 
           cp "$(find clipper -name clipper.hpp | head -1)" \
-             /include/polyclipping/
+             polyclipping/include/
 
-          test -f /include/polyclipping/clipper.hpp
+          test -f polyclipping/include/clipper.hpp
 
           echo "Installed:"
-          ls -l /include/polyclipping/clipper.hpp
+          ls -l polyclipping/include/clipper.hpp
 
 
       - name: Configure Fritzing
