@@ -171,42 +171,44 @@ jobs:
           echo "QuaZip headers:"
           find "$QUAZIP_INC" -type f | sort
 
-      - name: Build polyclipping (Clipper 6.4.2)
-        shell: bash
+
+      - name: Fetch svgpp
+        working-directory: ${{ github.workspace }}
         run: |
-          cd "$GITHUB_WORKSPACE"
+          git clone --depth=1 \
+            https://github.com/svgpp/svgpp.git \
+            svgpp
 
-          wget -q \
-            https://downloads.sourceforge.net/project/polyclipping/clipper_ver6.4.2.zip \
-            -O clipper.zip
+          mkdir -p svgpp/include
 
-          unzip -q clipper.zip
+          echo "svgpp installed:"
+          find svgpp/include -maxdepth 2 -type d
+
+      - name: Build PolyClipper (Clipper1)
+        working-directory: ${{ github.workspace }}
+        run: |
+          wget -q https://downloads.sourceforge.net/project/polyclipping/clipper_ver6.4.2.zip
+
+          unzip -q clipper_ver6.4.2.zip
+
           mv cpp polyclipping
 
           cd polyclipping
 
-          mkdir build
-          cd build
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/polyclipping/install
 
-          cmake .. \
-            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/polyclipping/install"
+          cmake --build build -j$(nproc)
+          cmake --install build
 
-          make -j"$(nproc)"
-          make install
+          # Fritzing expects clipper.hpp directly reachable
+          mkdir -p ${{ github.workspace }}/polyclipping/include
+          cp cpp/clipper.hpp \
+             ${{ github.workspace }}/polyclipping/include/
 
-          cd "$GITHUB_WORKSPACE/polyclipping"
-
-          # Fritzing expects this layout
-          mkdir -p include/polyclipping
-
-          cp install/include/polyclipping/clipper.hpp \
-             include/polyclipping/
-
-          mkdir -p lib
-          cp install/lib/libpolyclipping.so* lib/ || true
-
-          echo "Checking:"
-          ls -l include/polyclipping/clipper.hpp
+          echo "PolyClipper:"
+          find ${{ github.workspace }}/polyclipping -name clipper.hpp
 
 
       - name: Configure Fritzing
