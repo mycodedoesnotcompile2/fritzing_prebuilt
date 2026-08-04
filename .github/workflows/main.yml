@@ -72,7 +72,49 @@ jobs:
             qtcharts
             qtserialport
             qt5compat
-
+      
+      - name: Install Clipper1 (polyclipping 6.4.2)
+        shell: bash
+        run: |
+          set -euxo pipefail
+      
+          cd "$GITHUB_WORKSPACE"
+      
+          wget -q \
+            https://sourceforge.net/projects/polyclipping/files/clipper_ver6.4.2.zip/download \
+            -O clipper.zip
+      
+          unzip -q clipper.zip -d clipper-src
+      
+          # Fritzing searches for:
+          # $GITHUB_WORKSPACE/Clipper1/6.4.2
+          PREFIX="$GITHUB_WORKSPACE/Clipper1/6.4.2"
+      
+          mkdir -p "$PREFIX/include/polyclipping"
+          mkdir -p "$PREFIX/lib"
+      
+          cp clipper-src/cpp/clipper.hpp \
+             "$PREFIX/include/polyclipping/"
+      
+          cp clipper-src/cpp/clipper.cpp \
+             "$PREFIX/"
+      
+          g++ \
+            -std=c++17 \
+            -O2 \
+            -fPIC \
+            -I"$PREFIX/include/polyclipping" \
+            -c "$PREFIX/clipper.cpp" \
+            -o "$PREFIX/clipper.o"
+      
+          ar rcs \
+            "$PREFIX/lib/libpolyclipping.a" \
+            "$PREFIX/clipper.o"
+      
+          echo "==== Installed Clipper ===="
+          find "$PREFIX" -type f | sort
+      
+          ls -lh "$PREFIX/lib"
       
       - name: Build libgit2
         run: |
@@ -182,28 +224,6 @@ jobs:
           test -d svgpp/include/svgpp
 
 
-      - name: Install polyclipping (Clipper 6.4.2)
-        run: |
-          cd "$GITHUB_WORKSPACE"
-
-          wget -q \
-            https://sourceforge.net/projects/polyclipping/files/clipper_ver6.4.2.zip/download \
-            -O clipper.zip
-
-          unzip -q clipper.zip -d clipper
-
-          mkdir -p polyclipping/include
-
-          find clipper -name clipper.hpp -print
-
-          cp "$(find clipper -name clipper.hpp | head -1)" \
-             polyclipping/include/
-
-          test -f polyclipping/include/clipper.hpp
-
-          echo "Installed:"
-          ls -l polyclipping/include/clipper.hpp
-
 
       - name: Configure Fritzing
         working-directory: fritzing-app
@@ -212,7 +232,6 @@ jobs:
             CONFIG+=release \
             QT+=core5compat \
             INCLUDEPATH+="$GITHUB_WORKSPACE/svgpp/include" \
-            INCLUDEPATH+="$GITHUB_WORKSPACE/polyclipping/include" \
             DEFINES+=QT_NO_DEBUG
 
       - name: Build Fritzing
