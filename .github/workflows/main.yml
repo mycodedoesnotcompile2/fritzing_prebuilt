@@ -218,7 +218,7 @@ jobs:
       - name: Fetch svgpp
         working-directory: ${{ github.workspace }}
         run: |
-          git clone --depth=1 \
+          sudo git clone --depth=1 \
             https://github.com/svgpp/svgpp.git \
             "$GITHUB_WORKSPACE/../../svgpp-1.3.1"
           
