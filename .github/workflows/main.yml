@@ -89,7 +89,7 @@ jobs:
           # Fritzing searches for:
           # $GITHUB_WORKSPACE/Clipper1/6.4.2
           #PREFIX="$GITHUB_WORKSPACE/Clipper1/6.4.2"
-          PREFIX="$GITHUB_WORKSPACE/../Clipper1/6.4.2"
+          PREFIX="$GITHUB_WORKSPACE/../../Clipper1/6.4.2"
       
           mkdir -p "$PREFIX/include/polyclipping"
           mkdir -p "$PREFIX/lib"
