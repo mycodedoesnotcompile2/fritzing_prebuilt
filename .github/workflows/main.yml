@@ -218,13 +218,11 @@ jobs:
       - name: Fetch svgpp
         working-directory: ${{ github.workspace }}
         run: |
-          sudo git clone --depth=1 \
+          git clone --depth=1 \
             https://github.com/svgpp/svgpp.git \
             "$GITHUB_WORKSPACE/../../svgpp-1.3.1"
           
-          test -d svgpp/include/svgpp
-
-
+          test -d "$GITHUB_WORKSPACE/../../svgpp-1.3.1/include/svgpp"
 
       - name: Configure Fritzing
         working-directory: fritzing-app
