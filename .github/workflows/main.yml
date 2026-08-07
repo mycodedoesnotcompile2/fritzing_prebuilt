@@ -139,16 +139,16 @@ jobs:
           wget -nv "$LIBGIT2_URL" -O libgit2.zip
           unzip -q libgit2.zip
           
+          cd "$LIBGIT2_DIR"
+          cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$LIBGIT2_DIR"
+          cmake --build . -j$(nproc) --config Release
+          cmake --install .
           
-          cd libgit2
-          cmake \
-            -B build \
-            -DBUILD_SHARED_LIBS=ON \
-            -DUSE_SSH=OFF
+          fdfind . "$LIBGIT2_DIR/lib/" -a -x ls -ld
+          fdfind . "$LIBGIT2_DIR/include/" -a -x ls -ld
 
-          cmake --build build -j$(nproc)
-          sudo cmake --install build
-
+          exit 1
+ 
 
       - name: Build ngspice
         run: |
