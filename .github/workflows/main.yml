@@ -84,45 +84,21 @@ jobs:
             qt5compat
       
       - name: Install Clipper1 (polyclipping 6.4.2)
-        shell: bash
         run: |
           cd $ROOT_DIR
+          mkdir -p "$CLIPPER_DIR/include/polyclipping" "$CLIPPER_DIR/lib"
           
           wget -nv "$CLIPPER_URL" -O clipper.zip
           unzip -q clipper.zip -d clipper-src
-
-          mkdir -p "$CLIPPER_DIR"
-      
-          # Fritzing searches for:
-          # $GITHUB_WORKSPACE/Clipper1/6.4.2
-          #PREFIX="$GITHUB_WORKSPACE/Clipper1/6.4.2"
-          PREFIX="$GITHUB_WORKSPACE/../../Clipper1/6.4.2"
-      
-          mkdir -p "$PREFIX/include/polyclipping"
-          mkdir -p "$PREFIX/lib"
-      
-          cp clipper-src/cpp/clipper.hpp \
-             "$PREFIX/include/polyclipping/"
-      
-          cp clipper-src/cpp/clipper.cpp \
-             "$PREFIX/"
-      
-          g++ \
-            -std=c++17 \
-            -O2 \
-            -fPIC \
-            -I"$PREFIX/include/polyclipping" \
-            -c "$PREFIX/clipper.cpp" \
-            -o "$PREFIX/clipper.o"
-      
-          ar rcs \
-            "$PREFIX/lib/libpolyclipping.a" \
-            "$PREFIX/clipper.o"
-      
-          echo "==== Installed Clipper ===="
-          find "$PREFIX" -type f | sort
-      
-          ls -lh "$PREFIX/lib"
+          cp clipper-src/cpp/clipper.hpp "$CLIPPER_DIR/include/polyclipping/"
+          
+          g++ -std=c++17 -O2 -fPIC -I"$CLIPPER_DIR/include/polyclipping/" -c "$ROOT_DIR/clipper-src/cpp/clipper.cpp" -o "$ROOT_DIR/clipper-src/cpp/clipper.o"
+          ar rcs "$CLIPPER_DIR/lib/libpolyclipping.a" "$ROOT_DIR/clipper-src/cpp/clipper.o"
+          
+          ls -alh "$CLIPPER_DIR/lib/"
+          ls -alh "$CLIPPER_DIR/include/polyclipping"
+          exit 1
+          
       
       - name: Build libgit2
         run: |
