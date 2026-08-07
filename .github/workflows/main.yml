@@ -4,11 +4,21 @@ on:
   workflow_dispatch
 
 env:
-  APT: sudo apt -y -qq -o=Dpkg::Use-Pty=0
+  FRITZING_VERSION: 1.0.7
   QT_VERSION: 6.8.3
-
+  
   CLIPPER_URL: https://sourceforge.net/projects/polyclipping/files/clipper_ver6.4.2.zip/download
   
+  LIBGIT2_VERSION: 1.7.1
+  LIBGIT2_BASEURL: https://github.com/libgit2/libgit2/archive/refs/tags/
+  
+  QUAZIP_VERSION: 1.4
+  QUAZIP_BASEURL: https://github.com/stachenov/quazip/archive/refs/tags/
+  
+  SVGPP_VERSION: 1.3.1
+  SVGPP_BASEURL: https://github.com/svgpp/svgpp/archive/refs/tags/
+  
+  APT: sudo apt -y -qq -o=Dpkg::Use-Pty=0
 
 defaults:
   run:
@@ -22,16 +32,38 @@ jobs:
       - name: Setup env vars
         run: |
           ROOT_DIR="${{ runner.temp }}"
+          
+          FRITZING_RELEASE_DIR="$ROOT_DIR/Fritzing-$FRITZING_VERSION"
           CLIPPER_DIR="$ROOT_DIR/Clipper1-6.4.2/"
+          
+          LIBGIT2_DIR="$ROOT_DIR/libgit2-$LIBGIT2_VERSION"
+          LIBGIT2_URL="$LIBGIT2_BASEURL/v$LIBGIT2_VERSION.zip"
+
+          QUAZIP_DIR="$ROOT_DIR/quazip-$QT_VERSION-$QUAZIP_VERSIONintuisphere"
+          QUAZIP_URL="$QUAZIP_BASEURL/v$QUAZIP_VERSION.zip"
+
+          SVGPP_DIR="$ROOT_DIR/svgpp-$SVGPP_VERSION"
+          SVGPP_URL="$SVGPP_BASEURL/v$SVGPP_VERSION.zip"
 
           echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
           echo "CLIPPER_DIR=$CLIPPER_DIR" >> $GITHUB_ENV
+          
+          echo "LIBGIT2_DIR=$LIBGIT2_DIR" >> $GITHUB_ENV
+          echo "LIBGIT2_URL=$LIBGIT2_URL" >> $GITHUB_ENV
+          
+          echo "QUAZIP_DIR=$QUAZIP_DIR" >> $GITHUB_ENV
+          echo "QUAZIP_URL=$QUAZIP_URL" >> $GITHUB_ENV
+
+          echo "SVGPP_DIR=$SVGPP_DIR" >> $GITHUB_ENV
+          echo "SVGPP_URL=$SVGPP_URL" >> $GITHUB_ENV
+          
+          echo "FRITZING_RELEASE_DIR=$FRITZING_RELEASE_DIR" >> $GITHUB_ENV
           
       - name: Checkout Fritzing app
         uses: actions/checkout@v7
         with:
           repository: fritzing/fritzing-app
-          ref: 1.0.7
+          ref: ${{ env.FRITZING_VERSION }}
           path: fritzing-app
           fetch-depth: 1
 
@@ -99,19 +131,15 @@ jobs:
 
           fdfind . "$CLIPPER_DIR/lib/" -a -x ls -ld
           fdfind . "$CLIPPER_DIR/include/polyclipping" -a -x ls -ld
-          
-          exit 1
-          
+
       
       - name: Build libgit2
         run: |
-          mkdir -p deps
-
-          cd deps
-
-          # libgit2
-          git clone --depth=1 https://github.com/libgit2/libgit2.git
-
+          cd $ROOT_DIR
+          wget -nv "$LIBGIT2_URL" -O libgit2.zip
+          unzip -q libgit2.zip
+          
+          
           cd libgit2
           cmake \
             -B build \
