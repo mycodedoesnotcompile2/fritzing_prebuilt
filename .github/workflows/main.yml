@@ -147,12 +147,11 @@ jobs:
           fdfind . "$LIBGIT2_DIR/lib/" -a -x ls -ld
           fdfind . "$LIBGIT2_DIR/include/" -a -x ls -ld
 
-          exit 1
- 
 
       - name: Build ngspice
         run: |
-          cd "$GITHUB_WORKSPACE"
+          cd $ROOT_DIR
+          wget -nv "$LIBGIT2_URL" -O libgit2.zip
 
           git clone --depth=1 \
             https://git.code.sf.net/p/ngspice/ngspice \
