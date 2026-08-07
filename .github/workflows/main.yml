@@ -51,6 +51,7 @@ jobs:
             automake \
             libtool \
             bison \
+            fd-find \
             flex \
             build-essential \
             cmake \
@@ -95,9 +96,10 @@ jobs:
           
           g++ -std=c++17 -O2 -fPIC -I"$CLIPPER_DIR/include/polyclipping/" -c "$ROOT_DIR/clipper-src/cpp/clipper.cpp" -o "$ROOT_DIR/clipper-src/cpp/clipper.o"
           ar rcs "$CLIPPER_DIR/lib/libpolyclipping.a" "$ROOT_DIR/clipper-src/cpp/clipper.o"
+
+          fdfind . "$CLIPPER_DIR/lib/" -a -x ls -ld
+          fdfind . "$CLIPPER_DIR/include/polyclipping" -a -x ls -ld
           
-          ls -alh "$CLIPPER_DIR/lib/"
-          ls -alh "$CLIPPER_DIR/include/polyclipping"
           exit 1
           
       
