@@ -7,6 +7,9 @@ env:
   APT: sudo apt -y -qq -o=Dpkg::Use-Pty=0
   QT_VERSION: 6.8.3
 
+  CLIPPER_URL: https://sourceforge.net/projects/polyclipping/files/clipper_ver6.4.2.zip/download
+  
+
 defaults:
   run:
     shell: bash
@@ -16,6 +19,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup env vars
+        run: |
+          ROOT_DIR="${{ runner.temp }}"
+          CLIPPER_DIR="$ROOT_DIR/Clipper1-6.4.2/"
+
+          echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
+          
       - name: Checkout Fritzing app
         uses: actions/checkout@v7
         with:
@@ -76,15 +86,12 @@ jobs:
       - name: Install Clipper1 (polyclipping 6.4.2)
         shell: bash
         run: |
-          set -euxo pipefail
-      
-          cd "$GITHUB_WORKSPACE"
-      
-          wget -q \
-            https://sourceforge.net/projects/polyclipping/files/clipper_ver6.4.2.zip/download \
-            -O clipper.zip
-      
+          cd $ROOT_DIR
+          
+          wget -nv "$CLIPPER_URL" -O clipper.zip
           unzip -q clipper.zip -d clipper-src
+
+          mkdir -p "$CLIPPER_DIR"
       
           # Fritzing searches for:
           # $GITHUB_WORKSPACE/Clipper1/6.4.2
