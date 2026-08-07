@@ -25,6 +25,7 @@ jobs:
           CLIPPER_DIR="$ROOT_DIR/Clipper1-6.4.2/"
 
           echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
+          echo "CLIPPER_DIR=$CLIPPER_DIR" >> $GITHUB_ENV
           
       - name: Checkout Fritzing app
         uses: actions/checkout@v7
