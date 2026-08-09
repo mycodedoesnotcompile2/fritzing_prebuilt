@@ -41,7 +41,7 @@ jobs:
           ROOT_DIR="$GITHUB_WORKSPACE"
           
           FRITZING_RELEASE_DIR="$ROOT_DIR/Fritzing-$FRITZING_VERSION"
-          FRITZING_RELEASE_FILE="$ROOT_DIR/Fritzing-$FRITZING_VERSION.tar.gz"
+          FRITZING_RELEASE_FILE="$ROOT_DIR/Fritzing-$FRITZING_VERSION-linux-x86_64.tar.gz"
           
           CLIPPER_DIR="$ROOT_DIR/Clipper1-6.4.2/"
           
@@ -233,19 +233,6 @@ jobs:
           cd "$ROOT_DIR"
           #tar -czf "$FRITZING_RELEASE_FILE" --exclude='.git' -C "$FRITZING_RELEASE_DIR" .
           tar -czf "$FRITZING_RELEASE_FILE" --exclude='.git' -C "$(dirname "$FRITZING_RELEASE_DIR")" "$(basename "$FRITZING_RELEASE_DIR")"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: fritzing-release-linux
-          path: ${{ env.FRITZING_RELEASE_FILE }}
-
-      - name: Download Artifact
-        uses: actions/download-artifact@v8
-        with:
-          pattern: fritzing-release-*
-          merge-multiple: true
-          path: /tmp/results
      
       - name: Create a new Github release
         uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b #v3.0.1
