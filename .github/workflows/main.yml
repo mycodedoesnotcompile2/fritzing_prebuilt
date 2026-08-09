@@ -41,7 +41,8 @@ jobs:
           
           LIBGIT2_DIR="$ROOT_DIR/libgit2-$LIBGIT2_VERSION"
           LIBGIT2_URL="$LIBGIT2_BASEURL/v$LIBGIT2_VERSION.zip"
-          
+
+          QUAZIP_ZIP_DIR="${ROOT_DIR}/quazip-$QT_VERSION"
           QUAZIP_DIR="${ROOT_DIR}/quazip-$QT_VERSION-${QUAZIP_VERSION}intuisphere"
           QUAZIP_URL="$QUAZIP_BASEURL/v$QUAZIP_VERSION.zip"
 
@@ -57,6 +58,7 @@ jobs:
           echo "LIBGIT2_DIR=$LIBGIT2_DIR" >> $GITHUB_ENV
           echo "LIBGIT2_URL=$LIBGIT2_URL" >> $GITHUB_ENV
           
+          echo "QUAZIP_ZIP_DIR=$QUAZIP_ZIP_DIR" >> $GITHUB_ENV
           echo "QUAZIP_DIR=$QUAZIP_DIR" >> $GITHUB_ENV
           echo "QUAZIP_URL=$QUAZIP_URL" >> $GITHUB_ENV
 
@@ -181,42 +183,19 @@ jobs:
       
       - name: Build QuaZip
         run: |
-          cd "$GITHUB_WORKSPACE"
-      
-          git clone --depth=1 https://github.com/stachenov/quazip.git \
-            quazip-6.8.3-1.4intuisphere
-      
-          cd quazip-6.8.3-1.4intuisphere
-      
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DQUAZIP_QT_MAJOR_VERSION=6 \
-            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/quazip-6.8.3-1.4intuisphere"
-      
+          cd $ROOT_DIR
+          wget -nv "$QUAZIP_URL" -O quazip.zip
+          unzip -q quazip.zip
+
+          mv "$QUAZIP_ZIP_DIR" "$QUAZIP_DIR"
+          cd "$QUAZIP_DIR"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DQUAZIP_QT_MAJOR_VERSION=6 -DCMAKE_INSTALL_PREFIX="$QUAZIP_DIR"
           cmake --build build -j$(nproc)
           cmake --install build
+          
+          fdfind . "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip" -a -x ls -ld
 
-      - name: Fix QuaZip include layout
-        shell: bash
-        run: |
-          set -euxo pipefail
-      
-          QUAZIP_DIR="$GITHUB_WORKSPACE/quazip-6.8.3-1.4intuisphere"
-          QUAZIP_INC="$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip"
-      
-          mkdir -p "$QUAZIP_INC"
-      
-          # Public headers
-          cp "$QUAZIP_DIR"/quazip/*.h "$QUAZIP_INC/"
-      
-          # Generated configuration header
-          cp "$(find "$QUAZIP_DIR/build" -name quazip_config.h -type f | head -1)" \
-             "$QUAZIP_INC/"
-      
-          echo "QuaZip headers:"
-          find "$QUAZIP_INC" -type f | sort
-
-      - name: Fetch svgpp ${{ env.SVGPP_VERSION }}
+      - name: Fetch svgpp
         working-directory: ${{ github.workspace }}
         run: |
           git clone --depth=1 \
