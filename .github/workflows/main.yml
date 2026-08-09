@@ -37,7 +37,8 @@ jobs:
     steps:
       - name: Setup env vars
         run: |
-          ROOT_DIR="${{ runner.temp }}"
+          #ROOT_DIR="${{ runner.temp }}"
+          ROOT_DIR="$GITHUB_WORKSPACE"
           
           FRITZING_RELEASE_DIR="$ROOT_DIR/Fritzing-$FRITZING_VERSION"
           FRITZING_RELEASE_FILE="$ROOT_DIR/Fritzing-$FRITZING_VERSION.tar.gz"
