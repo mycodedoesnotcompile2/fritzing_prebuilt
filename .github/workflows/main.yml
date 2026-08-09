@@ -44,7 +44,7 @@ jobs:
           LIBGIT2_DIR="$ROOT_DIR/libgit2-$LIBGIT2_VERSION"
           LIBGIT2_URL="$LIBGIT2_BASEURL/v$LIBGIT2_VERSION.zip"
 
-          QUAZIP_ZIP_DIR="${ROOT_DIR}/quazip-$QT_VERSION"
+          QUAZIP_ZIP_DIR="${ROOT_DIR}/quazip-$QUAZIP_VERSION"
           QUAZIP_DIR="${ROOT_DIR}/quazip-$QT_VERSION-${QUAZIP_VERSION}intuisphere"
           QUAZIP_URL="$QUAZIP_BASEURL/v$QUAZIP_VERSION.zip"
 
