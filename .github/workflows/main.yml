@@ -3,6 +3,9 @@ name: Build
 on:
   workflow_dispatch
 
+permissions:
+  contents: write
+
 env:
   FRITZING_VERSION: 1.0.7
   QT_VERSION: 6.8.3
