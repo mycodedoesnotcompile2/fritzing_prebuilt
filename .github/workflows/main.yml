@@ -182,7 +182,7 @@ jobs:
           
           cd "$LIBGIT2_DIR"
           cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$LIBGIT2_DIR"
-          cmake --build . -j$(nproc) --config Release
+          cmake --build . -j"$(nproc)" --config Release
           cmake --install .
           
           fdfind . "$LIBGIT2_DIR/lib/" -a -x ls -ld
@@ -198,7 +198,7 @@ jobs:
           mv "$QUAZIP_ZIP_DIR" "$QUAZIP_DIR"
           cd "$QUAZIP_DIR"
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DQUAZIP_QT_MAJOR_VERSION=6 -DCMAKE_INSTALL_PREFIX="$QUAZIP_DIR"
-          cmake --build build -j$(nproc)
+          cmake --build build -j"$(nproc)"
           cmake --install build
           
           fdfind . "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip" -a -x ls -ld
@@ -219,7 +219,7 @@ jobs:
       - name: Build Fritzing 
         working-directory: fritzing-app
         run: |
-          make -j$(nproc)
+          make -j"$(nproc)"
           make install
 
       - name: Prepare artifact
@@ -237,7 +237,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: fritzing-release-linux
-          path: $${ env.FRITZING_RELEASE_FILE }}
+          path: ${{ env.FRITZING_RELEASE_FILE }}
 
       - name: Download Artifact
         uses: actions/download-artifact@v8
@@ -252,6 +252,6 @@ jobs:
           make_latest: true
           #body_path: ${{ env.RELEASE_NOTES }}
           #name: version ${{ env.ARTI_VERSION }} - build ${{ env.ARTI_CURRENT_COMMIT_ID }}
-          tag_name: ${{ env.FRITZING_VERSION }}
+          tag_name: v${{ env.FRITZING_VERSION }}
           files: |
             /tmp/results/*.tar.gz
