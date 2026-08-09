@@ -124,9 +124,9 @@ jobs:
         uses: ArchitektApx/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          host: linux
+          host: linux_arm64
           target: desktop
-          arch: linux_arm64
+          arch: linux_gcc_arm64
           modules: >
             qtcharts
             qtserialport
