@@ -121,7 +121,7 @@ jobs:
             zlib1g-dev
 
       - name: Install Qt
-        uses: ArchitektApx/install-qt-action@v4
+        uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
           host: linux_arm64
