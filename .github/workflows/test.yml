@@ -1,0 +1,22 @@
+name: Test Linux arm64
+
+on:
+  workflow_dispatch
+
+jobs:
+  test-arm64:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Check architecture
+        run: |
+          uname -m
+          dpkg --print-architecture
+
+      - name: Install aqt
+        run: |
+          python3 -m pip install aqtinstall
+
+      - name: List Qt architectures
+        run: |
+          aqt list-qt linux desktop --arch 6.8.3
