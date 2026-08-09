@@ -49,7 +49,7 @@ jobs:
           SVGPP_URL="$SVGPP_BASEURL/v$SVGPP_VERSION.zip"
 
           NGSPICE_DIR="$ROOT_DIR/ngspice-$NGSPICE_VERSION"
-          NGSPICE_DIR_INSTALL=="$ROOT_DIR/ngspice-$NGSPICE_VERSION/install"
+          NGSPICE_DIR_INSTALL="$ROOT_DIR/ngspice-$NGSPICE_VERSION/install"
 
           echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
           echo "CLIPPER_DIR=$CLIPPER_DIR" >> $GITHUB_ENV
