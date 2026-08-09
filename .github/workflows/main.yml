@@ -48,8 +48,8 @@ jobs:
           SVGPP_DIR="$ROOT_DIR/svgpp-$SVGPP_VERSION"
           SVGPP_URL="$SVGPP_BASEURL/v$SVGPP_VERSION.zip"
 
-          NGSPICE_DIR="$ROOT_DIR/ngspice-$NGSPICE_VERSION"
-          NGSPICE_DIR_INSTALL="$ROOT_DIR/ngspice-$NGSPICE_VERSION/install"
+          NGSPICE_DIR="$ROOT_DIR/$NGSPICE_VERSION"
+          NGSPICE_DIR_INSTALL="$ROOT_DIR/$NGSPICE_VERSION/install"
 
           echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
           echo "CLIPPER_DIR=$CLIPPER_DIR" >> $GITHUB_ENV
@@ -125,8 +125,30 @@ jobs:
             qtcharts
             qtserialport
             qt5compat
+
+      - name: Build ${{ env.NGSPICE_VERSION }}
+        run: |
+          cd $ROOT_DIR
+          git clone --depth 1 --branch "$NGSPICE_VERSION" --single-branch "$NGSPICE_URL" "$NGSPICE_VERSION"
+          
+          cd "$NGSPICE_DIR"
+          ./autogen.sh
+          ./configure --with-ngshared --enable-xspice --disable-debug --prefix="$NGSPICE_DIR_INSTALL"
+          make -j"$(nproc)"
+          make install
+          
+          mkdir -p include/ngspice
+          cp install/include/ngspice/*.h include/ngspice/
+
+          # Fritzing expects the library directly under ngspice-42/lib
+          mkdir -p lib
+          cp install/lib/libngspice.so* lib/
+          
+          fdfind . "$NGSPICE_DIR_INSTALL/lib/" -a -x ls -ld
+          fdfind . "$NGSPICE_DIR_INSTALL/include/ngspice" -a -x ls -ld
+
       
-      - name: Install Clipper1 (polyclipping 6.4.2)
+      - name: Build Clipper1 (polyclipping 6.4.2)
         run: |
           cd $ROOT_DIR
           mkdir -p "$CLIPPER_DIR/include/polyclipping" "$CLIPPER_DIR/lib"
@@ -142,7 +164,7 @@ jobs:
           fdfind . "$CLIPPER_DIR/include/polyclipping" -a -x ls -ld
 
       
-      - name: Build libgit2
+      - name: Build libgit2 ${{ env.LIBGIT2_VERSION }}
         run: |
           cd $ROOT_DIR
           wget -nv "$LIBGIT2_URL" -O libgit2.zip
@@ -156,29 +178,8 @@ jobs:
           fdfind . "$LIBGIT2_DIR/lib/" -a -x ls -ld
           fdfind . "$LIBGIT2_DIR/include/" -a -x ls -ld
 
-
-      - name: Build ngspice
-        run: |
-          cd $ROOT_DIR
-          git clone --depth 1 --branch "$NGSPICE_VERSION" --single-branch "$NGSPICE_URL" "$NGSPICE_VERSION"
-          
-          cd "$NGSPICE_VERSION"
-          ./autogen.sh
-          ./configure --with-ngshared --enable-xspice --disable-debug --prefix="$NGSPICE_DIR_INSTALL"
-          make -j"$(nproc)"
-          make install
-          
-          mkdir -p include/ngspice
-          cp install/include/ngspice/*.h include/ngspice/
-
-          # Fritzing expects the library directly under ngspice-42/lib
-          mkdir -p lib
-          cp install/lib/libngspice.so* lib/
-          
-          fdfind . "$NGSPICE_DIR_INSTALL/lib/" -a -x ls -ld
-          fdfind . "$NGSPICE_DIR_INSTALL/include/ngspice" -a -x ls -ld
       
-      - name: Build QuaZip
+      - name: Build QuaZip ${{ env.QUAZIP_VERSION }}
         run: |
           cd "$GITHUB_WORKSPACE"
       
@@ -215,7 +216,7 @@ jobs:
           echo "QuaZip headers:"
           find "$QUAZIP_INC" -type f | sort
 
-      - name: Fetch svgpp
+      - name: Fetch svgpp ${{ env.SVGPP_VERSION }}
         working-directory: ${{ github.workspace }}
         run: |
           git clone --depth=1 \
@@ -224,7 +225,7 @@ jobs:
           
           test -d "$GITHUB_WORKSPACE/../../svgpp-1.3.1/include/svgpp"
 
-      - name: Configure Fritzing
+      - name: Configure Fritzing ${{ env.FRITZING_VERSION }}
         working-directory: fritzing-app
         run: |
           qmake6 phoenix.pro \
@@ -233,7 +234,7 @@ jobs:
             INCLUDEPATH+="$GITHUB_WORKSPACE/svgpp/include" \
             DEFINES+=QT_NO_DEBUG
 
-      - name: Build Fritzing
+      - name: Build Fritzing ${{ env.FRITZING_VERSION }}
         working-directory: fritzing-app
         run: |
           make -j$(nproc)
