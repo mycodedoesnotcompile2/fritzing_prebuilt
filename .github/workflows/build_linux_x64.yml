@@ -242,4 +242,4 @@ jobs:
           #name: version ${{ env.ARTI_VERSION }} - build ${{ env.ARTI_CURRENT_COMMIT_ID }}
           tag_name: v${{ env.FRITZING_VERSION }}
           files: |
-            /tmp/results/*.tar.gz
+            ${{ env.FRITZING_RELEASE_FILE }}
