@@ -231,7 +231,8 @@ jobs:
           mv "$GITHUB_WORKSPACE/fritzing-parts" .
           
           cd "$ROOT_DIR"
-          tar -czf "$FRITZING_RELEASE_FILE" --exclude='.git' -C "$FRITZING_RELEASE_DIR" .
+          #tar -czf "$FRITZING_RELEASE_FILE" --exclude='.git' -C "$FRITZING_RELEASE_DIR" .
+          tar -czf "$FRITZING_RELEASE_FILE" --exclude='.git' -C "$(dirname "$FRITZING_RELEASE_DIR")" "$(basename "$FRITZING_RELEASE_DIR")"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
