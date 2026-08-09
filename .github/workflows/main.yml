@@ -48,6 +48,9 @@ jobs:
           SVGPP_DIR="$ROOT_DIR/svgpp-$SVGPP_VERSION"
           SVGPP_URL="$SVGPP_BASEURL/v$SVGPP_VERSION.zip"
 
+          NGSPICE_DIR="$ROOT_DIR/ngspice-$NGSPICE_VERSION"
+          NGSPICE_DIR_INSTALL=="$ROOT_DIR/ngspice-$NGSPICE_VERSION/install"
+
           echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
           echo "CLIPPER_DIR=$CLIPPER_DIR" >> $GITHUB_ENV
           
@@ -59,6 +62,9 @@ jobs:
 
           echo "SVGPP_DIR=$SVGPP_DIR" >> $GITHUB_ENV
           echo "SVGPP_URL=$SVGPP_URL" >> $GITHUB_ENV
+
+          echo "NGSPICE_DIR=$NGSPICE_DIR" >> $GITHUB_ENV
+          echo "NGSPICE_DIR_INSTALL=$NGSPICE_DIR_INSTALL" >> $GITHUB_ENV
           
           echo "FRITZING_RELEASE_DIR=$FRITZING_RELEASE_DIR" >> $GITHUB_ENV
           
@@ -158,35 +164,19 @@ jobs:
           
           cd "$NGSPICE_VERSION"
           ./autogen.sh
-          mkdir release
-          cd release
-
-          ../configure \
-            --with-ngshared \
-            --enable-xspice \
-            --disable-debug \
-            --prefix="$GITHUB_WORKSPACE/ngspice-42/install"
-
+          ./configure --with-ngshared --enable-xspice --disable-debug --prefix="$NGSPICE_DIR_INSTALL"
           make -j"$(nproc)"
           make install
-
-          cd "$GITHUB_WORKSPACE/ngspice-42"
-
-          # Fritzing expects headers directly under ngspice-42/include
+          
           mkdir -p include/ngspice
           cp install/include/ngspice/*.h include/ngspice/
 
           # Fritzing expects the library directly under ngspice-42/lib
           mkdir -p lib
           cp install/lib/libngspice.so* lib/
-
-          # Verify Fritzing discovery path
-          echo "ngspice headers:"
-          ls -la include/ngspice/sharedspice.h
-
-          echo "ngspice libraries:"
-          ls -la lib/libngspice.so*
           
+          fdfind . "$NGSPICE_DIR_INSTALL/lib/" -a -x ls -ld
+          fdfind . "$NGSPICE_DIR_INSTALL/include/ngspice" -a -x ls -ld
       
       - name: Build QuaZip
         run: |
