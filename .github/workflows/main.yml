@@ -229,15 +229,15 @@ jobs:
           
           cd "$FRITZING_RELEASE_DIR"
           mv "$GITHUB_WORKSPACE/fritzing-parts" .
-          tar -czf "$FRITZING_RELEASE_FILE" "$FRITZING_RELEASE_DIR"
-
+          
+          cd "$ROOT_DIR"
+          tar -czf "$FRITZING_RELEASE_FILE" --exclude='.git' -C "$FRITZING_RELEASE_DIR" .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: fritzing-release-linux
           path: $${ env.FRITZING_RELEASE_FILE }}
-
 
       - name: Download Artifact
         uses: actions/download-artifact@v8
