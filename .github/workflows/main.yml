@@ -202,7 +202,7 @@ jobs:
       - name: Fetch svgpp
         run: |
           cd $ROOT_DIR
-          wget -nv "$SVGPP_VERSION" -O svgpp.zip
+          wget -nv "$SVGPP_URL" -O svgpp.zip
           unzip -q svgpp.zip
           fdfind . "$SVGPP_DIR/include/svgpp" -a -x ls -ld
 
