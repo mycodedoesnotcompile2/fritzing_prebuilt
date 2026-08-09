@@ -220,7 +220,7 @@ jobs:
         working-directory: fritzing-app
         run: |
           make -j$(nproc)
-
+          make install
 
       - name: Prepare artifact
         run: |
