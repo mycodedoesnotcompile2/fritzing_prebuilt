@@ -37,7 +37,6 @@ jobs:
     steps:
       - name: Setup env vars
         run: |
-          #ROOT_DIR="${{ runner.temp }}"
           ROOT_DIR="$GITHUB_WORKSPACE"
           
           FRITZING_RELEASE_DIR="$ROOT_DIR/Fritzing-$FRITZING_VERSION"
@@ -197,8 +196,10 @@ jobs:
 
           mv "$QUAZIP_ZIP_DIR" "$QUAZIP_DIR"
           cd "$QUAZIP_DIR"
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DQUAZIP_QT_MAJOR_VERSION=6 -DCMAKE_INSTALL_PREFIX="$QUAZIP_DIR"
-          cmake --build build -j"$(nproc)"
+          #cmake -B build -DCMAKE_BUILD_TYPE=Release -DQUAZIP_QT_MAJOR_VERSION=6 -DCMAKE_INSTALL_PREFIX="$QUAZIP_DIR"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DQUAZIP_QT_MAJOR_VERSION=6 -DQUAZIP_BUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX="$QUAZIP_DIR"
+  
+          cmake --build build -j"$(nproc)" --config Release
           cmake --install build
           
           fdfind . "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip" -a -x ls -ld
@@ -221,6 +222,13 @@ jobs:
         run: |
           make -j"$(nproc)"
           make install
+
+      - name: Check bin dependencies  
+        run: |
+          cd "$FRITZING_RELEASE_DIR/bin"
+          file Fritzing
+          ldd Fritzing
+          readelf -d Fritzing | grep -E 'NEEDED|RUNPATH'
 
       - name: Prepare artifact
         run: |
