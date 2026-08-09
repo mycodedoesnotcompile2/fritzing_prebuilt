@@ -37,6 +37,8 @@ jobs:
           ROOT_DIR="${{ runner.temp }}"
           
           FRITZING_RELEASE_DIR="$ROOT_DIR/Fritzing-$FRITZING_VERSION"
+          FRITZING_RELEASE_FILE="$ROOT_DIR/Fritzing-$FRITZING_VERSION.tar.gz"
+          
           CLIPPER_DIR="$ROOT_DIR/Clipper1-6.4.2/"
           
           LIBGIT2_DIR="$ROOT_DIR/libgit2-$LIBGIT2_VERSION"
@@ -69,6 +71,8 @@ jobs:
           echo "NGSPICE_DIR_INSTALL=$NGSPICE_DIR_INSTALL" >> $GITHUB_ENV
           
           echo "FRITZING_RELEASE_DIR=$FRITZING_RELEASE_DIR" >> $GITHUB_ENV
+          echo "FRITZING_RELEASE_FILE=$FRITZING_RELEASE_FILE" >> $GITHUB_ENV
+          
           
       - name: Checkout Fritzing app
         uses: actions/checkout@v7
@@ -196,42 +200,54 @@ jobs:
           fdfind . "$QUAZIP_DIR/include/QuaZip-Qt6-1.4/quazip" -a -x ls -ld
 
       - name: Fetch svgpp
-        working-directory: ${{ github.workspace }}
         run: |
-          git clone --depth=1 \
-            https://github.com/svgpp/svgpp.git \
-            "$GITHUB_WORKSPACE/../../svgpp-1.3.1"
-          
-          test -d "$GITHUB_WORKSPACE/../../svgpp-1.3.1/include/svgpp"
+          cd $ROOT_DIR
+          wget -nv "$SVGPP_VERSION" -O svgpp.zip
+          unzip -q svgpp.zip
+          fdfind . "$SVGPP_DIR/include/svgpp" -a -x ls -ld
 
       - name: Configure Fritzing 
         working-directory: fritzing-app
         run: |
-          qmake6 phoenix.pro \
-            CONFIG+=release \
-            QT+=core5compat \
-            INCLUDEPATH+="$GITHUB_WORKSPACE/svgpp/include" \
-            DEFINES+=QT_NO_DEBUG
+          mkdir -p "$FRITZING_RELEASE_DIR"
+          qmake6 phoenix.pro CONFIG+=release QT+=core5compat DEFINES+=QT_NO_DEBUG PREFIX="$FRITZING_RELEASE_DIR"
 
       - name: Build Fritzing 
         working-directory: fritzing-app
         run: |
           make -j$(nproc)
 
+
       - name: Prepare artifact
         run: |
-          mkdir -p artifact
+          cd "$GITHUB_WORKSPACE/fritzing-parts"
+          rm -rf ".git"
+          
+          cd "$FRITZING_RELEASE_DIR"
+          mv "$GITHUB_WORKSPACE/fritzing-parts" .
+          tar -czf "$FRITZING_RELEASE_FILE" "$FRITZING_RELEASE_DIR"
 
-          cp fritzing-app/Fritzing artifact/
-
-          cp -r fritzing-parts artifact/parts
-
-          tar czf \
-            fritzing-1.0.7-linux-x86_64.tar.gz \
-            -C artifact .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: fritzing-1.0.7-linux-x86_64
-          path: fritzing-1.0.7-linux-x86_64.tar.gz
+          name: fritzing-release-linux
+          path: $${ env.FRITZING_RELEASE_FILE }}
+
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: fritzing-release-*
+          merge-multiple: true
+          path: /tmp/results
+     
+      - name: Create a new Github release
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b #v3.0.1
+        with:
+          make_latest: true
+          #body_path: ${{ env.RELEASE_NOTES }}
+          #name: version ${{ env.ARTI_VERSION }} - build ${{ env.ARTI_CURRENT_COMMIT_ID }}
+          tag_name: ${{ env.FRITZING_VERSION }}
+          files: |
+            /tmp/results/*.tar.gz
