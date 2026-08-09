@@ -129,7 +129,7 @@ jobs:
       - name: Build ${{ env.NGSPICE_VERSION }}
         run: |
           cd $ROOT_DIR
-          git clone --depth 1 --branch "$NGSPICE_VERSION" --single-branch "$NGSPICE_URL" "$NGSPICE_VERSION"
+          git clone --depth 1 --branch "$NGSPICE_VERSION" --single-branch "$NGSPICE_URL" "$NGSPICE_DIR"
           
           cd "$NGSPICE_DIR"
           ./autogen.sh
