@@ -126,7 +126,7 @@ jobs:
             qtserialport
             qt5compat
 
-      - name: Build ${{ env.NGSPICE_VERSION }}
+      - name: Build ngspice
         run: |
           cd $ROOT_DIR
           git clone --depth 1 --branch "$NGSPICE_VERSION" --single-branch "$NGSPICE_URL" "$NGSPICE_DIR"
@@ -164,7 +164,7 @@ jobs:
           fdfind . "$CLIPPER_DIR/include/polyclipping" -a -x ls -ld
 
       
-      - name: Build libgit2 ${{ env.LIBGIT2_VERSION }}
+      - name: Build libgit2
         run: |
           cd $ROOT_DIR
           wget -nv "$LIBGIT2_URL" -O libgit2.zip
@@ -179,7 +179,7 @@ jobs:
           fdfind . "$LIBGIT2_DIR/include/" -a -x ls -ld
 
       
-      - name: Build QuaZip ${{ env.QUAZIP_VERSION }}
+      - name: Build QuaZip
         run: |
           cd "$GITHUB_WORKSPACE"
       
@@ -225,7 +225,7 @@ jobs:
           
           test -d "$GITHUB_WORKSPACE/../../svgpp-1.3.1/include/svgpp"
 
-      - name: Configure Fritzing ${{ env.FRITZING_VERSION }}
+      - name: Configure Fritzing 
         working-directory: fritzing-app
         run: |
           qmake6 phoenix.pro \
@@ -234,7 +234,7 @@ jobs:
             INCLUDEPATH+="$GITHUB_WORKSPACE/svgpp/include" \
             DEFINES+=QT_NO_DEBUG
 
-      - name: Build Fritzing ${{ env.FRITZING_VERSION }}
+      - name: Build Fritzing 
         working-directory: fritzing-app
         run: |
           make -j$(nproc)
