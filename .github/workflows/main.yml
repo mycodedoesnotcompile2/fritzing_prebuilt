@@ -17,6 +17,9 @@ env:
   
   SVGPP_VERSION: 1.3.1
   SVGPP_BASEURL: https://github.com/svgpp/svgpp/archive/refs/tags
+
+  NGSPICE_VERSION: ngspice-42
+  NGSPICE_URL: https://git.code.sf.net/p/ngspice/ngspice
   
   APT: sudo apt -y -qq -o=Dpkg::Use-Pty=0
 
@@ -151,16 +154,10 @@ jobs:
       - name: Build ngspice
         run: |
           cd $ROOT_DIR
-          wget -nv "$LIBGIT2_URL" -O libgit2.zip
-
-          git clone --depth=1 \
-            https://git.code.sf.net/p/ngspice/ngspice \
-            ngspice-42
-
-          cd ngspice-42
-
+          git clone --depth 1 --branch "$NGSPICE_VERSION" --single-branch "$NGSPICE_URL" "$NGSPICE_VERSION"
+          
+          cd "$NGSPICE_VERSION"
           ./autogen.sh
-
           mkdir release
           cd release
 
